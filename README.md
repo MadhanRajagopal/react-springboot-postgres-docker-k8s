@@ -105,7 +105,7 @@ kubectl logs <pod-name>
 
 ```
 
-## --------------------------------Run Application using Local Image ------------------------------------------
+## --------------------------------Run Application using Local Image ----------------------------
 
 ##  1. Build Docker Images Locally using docker-compose 
 
