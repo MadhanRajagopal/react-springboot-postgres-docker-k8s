@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16
+    container_name: postgres-db
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DATABASE}
+    ports:
+      - "4000:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 5
+
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
+  backend:
+    image: employee-svc
+    build: ./backend/employee-service
+    container_name: employee-svc-app
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_URL=${DB_URL}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    image: emp-ui:test
+    build:
+      context: ./frontend/employee-ui
+      dockerfile: Dockerfile
+      args:
+        BACKEND_URL: ${APP_URL} # set at build time
+    environment:
+      - BACKEND_URL=${APP_URL} # replaces at runtime
+    container_name: employee-ui-app
+
+    ports:
+      - "80:80"
+    depends_on:
+      - backend

@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: employee-ingress
+  annotations:
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/force-ssl-redirect: "true" #http://employee.local → auto-redirects to https://employee.local
+    nginx.ingress.kubernetes.io/from-to-www-redirect: "false"
+spec:
+  ingressClassName: nginx
+  # tls:
+  #   - hosts:
+  #       - employee.local
+  #     secretName: employee-tls
+  rules:
+    - host: employee.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 5000
